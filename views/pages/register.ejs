@@ -1,96 +1,155 @@
 <%- include('../partials/header') %>
 
-    <div
-        style="min-height: 80vh; display: flex; align-items: center; justify-content: center; padding: 40px 5%; position: relative;">
-        <!-- Abstract Background Elements -->
-        <div
-            style="position: absolute; top: 10%; right: 10%; width: 500px; height: 500px; background: var(--secondary); filter: blur(200px); border-radius: 50%; opacity: 0.15;">
-        </div>
-        <div
-            style="position: absolute; bottom: 10%; left: 10%; width: 400px; height: 400px; background: var(--primary); filter: blur(200px); border-radius: 50%; opacity: 0.15;">
-        </div>
-
-        <div class="register-container"
-            style="width: 100%; max-width: 520px; background: var(--card-bg); backdrop-filter: blur(24px); border: 1px solid var(--border); border-radius: 40px; padding: 60px; box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.7); position: relative; z-index: 1;">
-            <div style="text-align: center; margin-bottom: 48px;">
-                <h2
-                    style="font-family: var(--font-heading); font-size: 2.5rem; font-weight: 800; margin-bottom: 12px; letter-spacing: -1.5px; color: #fff;">
-                    Join the Future</h2>
-                <p style="color: var(--text-muted); font-size: 1rem; font-weight: 500;">Create your account in seconds
-                </p>
+    <div class="auth-page">
+        <div class="auth-container">
+            <div class="auth-header">
+                <h2>Join the Future</h2>
+                <p>Create your account in seconds</p>
             </div>
 
-
-            <form action="/register" method="POST" style="display: flex; flex-direction: column; gap: 24px;">
+            <form action="/register" method="POST" class="auth-form">
                 <div class="form-group">
-                    <label
-                        style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--text); margin-bottom: 8px; margin-left: 4px;">Full
-                        Name</label>
-                    <div style="position: relative;">
-                        <i class="fa-regular fa-user"
-                            style="position: absolute; left: 18px; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
-                        <input type="text" name="name" required
-                            style="width: 100%; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border); border-radius: 14px; padding: 14px 20px 14px 50px; color: #fff; outline: none; transition: 0.3s; font-size: 1rem;"
-                            placeholder="John Doe">
+                    <label>Full Name</label>
+                    <div class="input-wrapper">
+                        <i class="fa-regular fa-user icon"></i>
+                        <input type="text" name="name" required placeholder="John Doe">
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label
-                        style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--text); margin-bottom: 8px; margin-left: 4px;">Email
-                        Address</label>
-                    <div style="position: relative;">
-                        <i class="fa-regular fa-envelope"
-                            style="position: absolute; left: 18px; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
-                        <input type="email" name="email" required
-                            style="width: 100%; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border); border-radius: 14px; padding: 14px 20px 14px 50px; color: #fff; outline: none; transition: 0.3s; font-size: 1rem;"
-                            placeholder="name@example.com">
+                    <label>Email Address</label>
+                    <div class="input-wrapper">
+                        <i class="fa-regular fa-envelope icon"></i>
+                        <input type="email" name="email" required placeholder="name@example.com">
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label
-                        style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--text); margin-bottom: 8px; margin-left: 4px;">Password</label>
-                    <div style="position: relative;">
-                        <i class="fa-solid fa-lock"
-                            style="position: absolute; left: 18px; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
-                        <input type="password" name="password" required
-                            style="width: 100%; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border); border-radius: 14px; padding: 14px 20px 14px 50px; color: #fff; outline: none; transition: 0.3s; font-size: 1rem;"
-                            placeholder="••••••••">
+                    <label>Password</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-lock icon"></i>
+                        <input type="password" name="password" required placeholder="••••••••">
                     </div>
                 </div>
 
-                <button type="submit" class="btn"
-                    style="width: 100%; padding: 18px; border: none; border-radius: 100px; background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: #fff; font-size: 1.1rem; font-weight: 700; cursor: pointer; transition: 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); box-shadow: 0 20px 40px rgba(99, 102, 241, 0.2); margin-top: 15px; letter-spacing: 0.5px;">Get
-                    Started Free</button>
+                <button type="submit" class="btn-submit">Get Started</button>
             </form>
 
-            <div style="text-align: center; margin-top: 40px; padding-top: 30px; border-top: 1px solid var(--border);">
-
-                <p style="color: var(--text-muted); font-size: 0.9rem;">
+            <div class="auth-footer">
+                <p>
                     Already have an account?
-                    <a href="/login"
-                        style="color: var(--text); text-decoration: none; font-weight: 700; margin-left: 5px;">Sign in
-                        instead</a>
+                    <a href="/login">Sign in instead</a>
                 </p>
             </div>
         </div>
     </div>
 
     <style>
-        input:focus {
-            border-color: var(--primary) !important;
-            background: rgba(255, 255, 255, 0.05) !important;
-            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1);
+        .auth-page {
+            min-height: 80vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 5%;
         }
 
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 15px 25px rgba(139, 92, 246, 0.4);
+        .auth-container {
+            width: 100%;
+            max-width: 520px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 40px;
+            z-index: 1;
         }
 
-        .btn:active {
-            transform: translateY(0);
+        .auth-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .auth-header h2 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper .icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        .input-wrapper input {
+            width: 100%;
+            padding: 12px 15px 12px 45px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 1rem;
+        }
+
+        .input-wrapper input:focus {
+            border-color: var(--primary);
+            outline: none;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .btn-submit {
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            background: var(--primary);
+            color: #fff;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background 0.3s;
+        }
+
+        .btn-submit:hover {
+            background: var(--primary-light);
+        }
+
+        .auth-footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+        }
+
+        .auth-footer p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .auth-footer a {
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 600;
+            margin-left: 5px;
         }
     </style>
 

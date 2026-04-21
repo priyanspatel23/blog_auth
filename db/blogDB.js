@@ -1,9 +1,11 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
-const connectDB = () => {
-    mongoose.connect("mongodb://localhost:27017/blogauth")
-        .then(() => console.log("MongoDB connected"))
-        .catch((err) => console.log(err));
-}
-
-module.exports = connectDB;
+module.exports = () => {
+    mongoose.connect('mongodb://localhost:27017/blogauth')
+        .then(() => {
+            console.log('db connected successfully');
+        })
+        .catch((err) => {
+            console.log('database error:', err);
+        });
+};

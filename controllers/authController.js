@@ -1,155 +1,124 @@
 const passport = require('passport');
-const User = require("../models/user");
+const User = require('../models/user');
+const bcrypt = require('bcryptjs');
+const { sendOtpEmail, generateOtp } = require('../utils/mailerServics');
 
-const bcrypt = require("bcryptjs");
-
-
-const { sendOtpEmail, generateOtp } = require("../utils/mailerServics");
-
-/* ===== REGISTER ===== */
 const reg = (req, res) => {
-  res.render("pages/register", { user: req.user, title: "Create Account" });
+  res.render('pages/register', { user: req.user, title: 'Create Account' });
 };
 
 const regPost = async (req, res) => {
   try {
     const { name, email, password } = req.body;
+    let existingUser = await User.findOne({ email });
 
-    const userExists = await User.findOne({ email });
-    if (userExists) {
-      return res.redirect("/register");
+    if (existingUser) {
+      return res.redirect('/register');
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
     await User.create({ name, email, password: hashedPassword });
 
-    req.flash("success", "Registration successful! Welcome to LUXBLOG. 🚀");
-    res.redirect("/login");
+    req.flash('success', 'Account created successfully. You can login now.');
+    res.redirect('/login');
   } catch (err) {
     console.log(err);
-    req.flash("error", "Registration failed. Please try again.");
-    res.redirect("/register");
+    req.flash('error', 'Registration failed.');
+    res.redirect('/register');
   }
 };
 
-/* ===== LOGIN ===== */
 const log = (req, res) => {
-  res.render("pages/login", { user: req.user, title: "Welcome Back" });
+  res.render('pages/login', { user: req.user, title: 'Login' });
 };
 
-const logPost = (req, res, next) => {
-  passport.authenticate('local', {
-    successRedirect: '/',
-    failureRedirect: '/login',
-    failureFlash: true
-  })(req, res, next);
-};
+const logPost = passport.authenticate('local', {
+  successRedirect: '/',
+  failureRedirect: '/login',
+  failureFlash: true
+});
 
-
-/* ===== LOGOUT ===== */
 const out = (req, res, next) => {
-  req.logout(function (err) {
-    if (err) { return next(err); }
-    req.flash("success", "Logged out successfully. See you soon! 👋");
-    res.redirect("/login");
+  req.logout((err) => {
+    if (err) return next(err);
+    req.flash('success', 'Logged out.');
+    res.redirect('/login');
   });
 };
 
-
-/* ===== FORGOT PASSWORD ===== */
 const forgot = (req, res) => {
-  res.render("pages/forgot-password", { user: req.user, title: "Forgot Password" });
+  res.render('pages/forgot-password', { user: req.user, title: 'Forgot Password' });
 };
 
 const forgotP = async (req, res) => {
   try {
-    const { email } = req.body;
-    const user = await User.findOne({ email });
-
+    const user = await User.findOne({ email: req.body.email });
     if (!user) {
-      req.flash("error", "No account found with that email address.");
-      return res.redirect("/forgot-password");
+      req.flash('error', 'Email not found.');
+      return res.redirect('/forgot-password');
     }
 
-    const otp = generateOtp(4);
-    console.log("Generated OTP:", otp);
+    let otp = generateOtp(4);
+    console.log("OTP is:", otp);
 
     user.otp = otp;
     user.otpExpire = Date.now() + 10 * 60 * 1000;
     await user.save();
 
-    // Send the email
-    try {
-      await sendOtpEmail(email, otp, user.name);
-    } catch (mailErr) {
-      console.log("Error sending email:", mailErr.message);
-    }
+    await sendOtpEmail(user.email, otp, user.name);
 
-    req.flash("success", "OTP sent successfully! Please check your inbox. 📧");
-    res.redirect("/verify-otp?email=" + email);
+    req.flash('success', 'OTP sent to your email account.');
+    res.redirect('/verify-otp?email=' + user.email);
   } catch (err) {
-    console.log("Forgot Password Error:", err);
-    req.flash("error", "Failed to send recovery code. Please try again.");
-    res.redirect("/forgot-password");
+    console.log(err);
+    req.flash('error', 'Something went wrong.');
+    res.redirect('/forgot-password');
   }
 };
 
-/* ===== VERIFY OTP ===== */
 const vOtp = (req, res) => {
-  res.render("pages/verify-otp", { user: req.user, title: "Verify OTP", email: req.query.email });
+  res.render('pages/verify-otp', { user: req.user, title: 'Verify OTP', email: req.query.email });
 };
 
 const vOtpP = async (req, res) => {
-  try {
-    const { email, otp } = req.body;
-    const user = await User.findOne({ email, otp, otpExpire: { $gt: Date.now() } });
+  const { email, otp } = req.body;
+  const user = await User.findOne({ email, otp, otpExpire: { $gt: Date.now() } });
 
-    if (!user) {
-      req.flash("error", "Invalid or expired OTP.");
-      return res.redirect(`/verify-otp?email=${email}`);
-    }
-
-    res.render("pages/reset-password", { user: req.user, title: "Reset Password", email, otp });
-  } catch (err) {
-    console.log(err);
-    res.redirect("/forgot-password");
+  if (!user) {
+    req.flash('error', 'OTP is invalid or expired.');
+    return res.redirect(`/verify-otp?email=${email}`);
   }
+
+  res.render('pages/reset-password', { user: req.user, title: 'Reset Password', email, otp });
 };
 
-/* ===== RESET PASSWORD ===== */
 const reset = async (req, res) => {
   try {
     const { email, otp, password, confirmPassword } = req.body;
 
     if (password !== confirmPassword) {
-      return res.render("pages/reset-password", { user: req.user, title: "Reset Password", email, otp });
+      req.flash('error', 'Passwords do not match.');
+      return res.render('pages/reset-password', { user: req.user, title: 'Reset Password', email, otp });
     }
 
     const user = await User.findOne({ email, otp, otpExpire: { $gt: Date.now() } });
-
     if (!user) {
-      req.flash("error", "Invalid or expired session. Please try again.");
-      return res.redirect("/forgot-password");
+      req.flash('error', 'Session expired. Try again.');
+      return res.redirect('/forgot-password');
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-    user.password = hashedPassword;
+    user.password = await bcrypt.hash(password, 10);
     user.otp = undefined;
     user.otpExpire = undefined;
     await user.save();
 
-    req.flash("success", "Password reset successful! You can now log in. 🔐");
-    res.redirect("/login");
+    req.flash('success', 'Password changed successfully!');
+    res.redirect('/login');
   } catch (err) {
     console.log(err);
-    req.flash("error", "Password reset failed. Please try the process again.");
-    res.redirect("/forgot-password");
+    req.flash('error', 'Error resetting password.');
+    res.redirect('/forgot-password');
   }
-};
-
-/* ===== RESET PASSWORD GET (Optional fallback) ===== */
-const resetPasswordGet = (req, res) => {
-  res.redirect("/forgot-password");
 };
 
 module.exports = { reg, regPost, log, logPost, out, forgot, forgotP, vOtp, vOtpP, reset };
